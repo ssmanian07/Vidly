@@ -28,14 +28,30 @@ namespace Vidly.Controllers
         {
             var genres = _context.Geners.ToList();
 
-            var viewModel = new MovieFormViewModel { Genres = genres };
+            var viewModel = new MovieFormViewModel 
+            {
+                Movie = new Movie(),
+                Genres = genres
+            };
 
             return View("MoviesForm", viewModel);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Save(Movie movie)
         {
+            if (!ModelState.IsValid) 
+            {
+                var viewModle = new MovieFormViewModel
+                {
+                    Movie = movie,
+                    Genres = _context.Geners.ToList()
+                };
+
+                return View("MoviesForm", viewModle);
+            }
+
             if (movie.Id == 0)
             {
                 movie.DateAdded = DateTime.Today.Date;
